@@ -10,12 +10,36 @@ class Signin extends React.Component {
     }
   }
 
+  componentDidMount = () => {
+    const token = window.localStorage.getItem('token');
+    if (token) {
+      fetch('http://localhost:3000/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.id) {
+            console.log('success we need user')
+          }
+        })
+        .catch(console.log)
+    }
+  }
+
   onEmailChange = (event) => {
     this.setState({ signInEmail: event.target.value })
   }
 
   onPasswordChange = (event) => {
     this.setState({ signInPassword: event.target.value })
+  }
+
+  saveAuthTokenInSession = (token) => {
+    window.localStorage.setItem('token', token);
   }
 
   onSubmitSignIn = () => {
@@ -28,9 +52,10 @@ class Signin extends React.Component {
       })
     })
       .then(response => response.json())
-      .then(user => {
-        if (user.id) {
-          this.props.loadUser(user)
+      .then(data => {
+        if (data.userId && data.success) {
+          this.saveAuthTokenInSession(data.token);
+          this.props.loadUser(data);
           this.props.onRouteChange('home');
         }
       })
