@@ -10,26 +10,6 @@ class Signin extends React.Component {
     }
   }
 
-  componentDidMount = () => {
-    const token = window.localStorage.getItem('token');
-    if (token) {
-      fetch('http://localhost:3000/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        }
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.id) {
-            console.log('success we need user')
-          }
-        })
-        .catch(console.log)
-    }
-  }
-
   onEmailChange = (event) => {
     this.setState({ signInEmail: event.target.value })
   }
@@ -55,8 +35,20 @@ class Signin extends React.Component {
       .then(data => {
         if (data.userId && data.success) {
           this.saveAuthTokenInSession(data.token);
-          this.props.loadUser(data);
-          this.props.onRouteChange('home');
+          fetch(`http://localhost:3000/profile/${data.userId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': data.token
+            }
+          })
+            .then(resp => resp.json())
+            .then(user => {
+              if (user && user.email && user) {
+                this.props.loadUser(user);
+                this.props.onRouteChange('home');
+              }
+            })
         }
       })
   }
