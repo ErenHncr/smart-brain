@@ -7,7 +7,8 @@ class Profile extends React.Component {
     this.state = {
       name: this.props.user.name,
       age: this.props.user.age,
-      pet: this.props.user.pet
+      pet: this.props.user.pet,
+      defaultProfile: 'http://tachyons.io/img/logo.jpg'
     }
   }
 
@@ -43,17 +44,27 @@ class Profile extends React.Component {
     })
   }
 
+  componentDidMount = () => {
+    setTimeout(() => {
+      document.getElementById('avatar2').src = document.getElementById('avatar1').src;
+      this.setState({
+        defaultProfile: document.getElementById('avatar1').src
+      })
+    }, 50)
+  }
 
   render() {
-    const { isProfileOpen, toggleModal, user } = this.props;
-    const { name, age, pet } = this.state;
+    const { toggleModal, user } = this.props;
+    const { name, age, pet, defaultProfile } = this.state;
     return (
       <div
         className="profile-modal">
         <article className="br3 ba b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center bg-white">
           <main className="pa4 black-80 w-80">
             <img
-              src="http://tachyons.io/img/logo.jpg"
+              id="avatar2"
+              onClick={toggleModal}
+              src={defaultProfile}
               className="br-100 ba h3 w3 dib" alt="avatar" />
             <h1>{this.state.name}</h1>
             <h4>{`Image Submitted: ${user.entries}`}</h4>
@@ -95,12 +106,11 @@ class Profile extends React.Component {
                 className="b pa2 grow pointer hover-white w-40 bg-light-blue b--black-20"
                 onClick={() => this.onProfileUpdate({ name, age, pet })}>
                 Save
-            </button>
+              </button>
               <button className="b pa2 grow pointer hover-white w-40 bg-light-red b--black-20"
                 onClick={toggleModal}>
                 Cancel
-            </button>
-
+              </button>
             </div>
 
           </main>

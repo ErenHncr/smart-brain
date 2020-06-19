@@ -9,6 +9,7 @@ import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import Modal from './components/Modal/Modal';
 import Profile from './components/Profile/Profile';
+import UploadForm from './components/Upload/Form';
 import './App.css';
 
 const particlesOptions = {
@@ -30,6 +31,8 @@ const initialState = {
   route: 'signin',
   isSignedIn: false,
   isProfileOpen: false,
+  isProfileImage: false,
+  isUploadFormOpen: false,
   user: {
     id: '',
     name: '',
@@ -93,6 +96,7 @@ class App extends Component {
         age: data.age
       }
     })
+    this.getProfileImage(data.id);
   }
 
   calculateFaceLocations = (data) => {
@@ -194,23 +198,63 @@ class App extends Component {
     )
   }
 
+  toggleUploadModal = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      isUploadFormOpen: !prevState.isUploadFormOpen
+    })
+    )
+  }
+
+  getProfileImage = async (id) => {
+    if (!this.state.isProfileImage) {
+      let profileImage;
+      await fetch(`http://localhost:3000/getUrl/${id}`)
+        .then(res => res.blob())
+        .then(resp => {
+          if (resp.type === 'image/jpg') {
+            // set profile image
+            profileImage = URL.createObjectURL(resp);
+            document.getElementById('avatar1').src = profileImage;
+            this.setState({
+              isProfileImage: true
+            })
+
+          } else {
+            document.getElementById('avatar').src = 'http://tachyons.io/img/logo.jpg';
+          }
+        })
+        .catch(err => console.log('hata'))
+    }
+
+  }
+
 
   render() {
-    const { isSignedIn, imageUrl, route, boxes, isProfileOpen, user } = this.state;
+    const { isSignedIn, imageUrl, route, boxes, isProfileOpen, isUploadFormOpen, user, isProfileImage } = this.state;
     return (
       <div className="App">
         <Particles className='particles'
           params={particlesOptions}
         />
-        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange}
-          toggleModal={this.toggleModal} />
+        <Navigation user={user} isSignedIn={isSignedIn} getProfileImage={this.getProfileImage} onRouteChange={this.onRouteChange}
+          toggleModal={this.toggleModal} toggleUploadModal={this.toggleUploadModal} />
         {isProfileOpen &&
           <Modal>
             <Profile
               isProfileOpen={isProfileOpen}
               toggleModal={this.toggleModal}
               loadUser={this.loadUser}
-              user={user} />
+              user={user}
+              isProfileImage={isProfileImage} />
+          </Modal>}
+
+        {isUploadFormOpen &&
+          <Modal>
+            <UploadForm
+              user={user}
+              toggleUploadModal={this.toggleUploadModal}
+            />
           </Modal>}
         {route === 'home'
           ? <div>

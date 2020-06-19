@@ -20,7 +20,6 @@ class ProfileIcon extends React.Component {
     }))
   }
 
-
   render() {
     return (
       <div className="pa4 tc" >
@@ -30,19 +29,21 @@ class ProfileIcon extends React.Component {
             data-toggle="dropdown"
             aria-expanded={this.state.dropdownOpen}>
             <img
+              id="avatar1"
               src="http://tachyons.io/img/logo.jpg"
               className="br-100 ba h3 w3 dib" alt="avatar" />
           </DropdownToggle>
           <DropdownMenu
             className="b--transparent shadow-5"
             style={{
-              width: '85px',
-              marginLeft: '-100px',
+              width: '240px',
+              marginLeft: '-180px',
               marginTop: '-8px',
               backgroundColor: "rgba(255,255,255,0.5)",
               right: "0px !important"
             }}>
             <DropdownItem onClick={this.props.toggleModal}>View Profile</DropdownItem>
+            <DropdownItem onClick={this.props.toggleUploadModal}>Upload Profile Image</DropdownItem>
             <DropdownItem onClick={() => this.props.onRouteChange('signout')}>Sign Out</DropdownItem>
           </DropdownMenu>
         </Dropdown>
