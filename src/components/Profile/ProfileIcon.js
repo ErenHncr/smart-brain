@@ -6,7 +6,7 @@ import {
   DropdownItem
 } from 'reactstrap';
 
-class ProfileIcon extends React.Component {
+class ProfileIcon extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {

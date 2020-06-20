@@ -31,7 +31,6 @@ const initialState = {
   route: 'signin',
   isSignedIn: false,
   isProfileOpen: false,
-  isProfileImage: false,
   isUploadFormOpen: false,
   user: {
     id: '',
@@ -204,54 +203,67 @@ class App extends Component {
       isUploadFormOpen: !prevState.isUploadFormOpen
     })
     )
+    //if (this.state.isUploadFormOpen) window.location.reload(false);
   }
 
   getProfileImage = async (id) => {
-    if (!this.state.isProfileImage) {
+    const token = window.localStorage.getItem('token');
+    if (token) {
       let profileImage;
-      await fetch(`http://localhost:3000/getUrl/${id}`)
+      await fetch(`http://localhost:3000/getUrl/${id}`, {
+        headers: {
+          'Authorization': token
+        }
+      })
         .then(res => res.blob())
         .then(resp => {
           if (resp.type === 'image/jpg') {
             // set profile image
             profileImage = URL.createObjectURL(resp);
             document.getElementById('avatar1').src = profileImage;
-            this.setState({
-              isProfileImage: true
-            })
-
           } else {
             document.getElementById('avatar').src = 'http://tachyons.io/img/logo.jpg';
           }
         })
         .catch(err => console.log('hata'))
     }
-
   }
 
-
   render() {
-    const { isSignedIn, imageUrl, route, boxes, isProfileOpen, isUploadFormOpen, user, isProfileImage } = this.state;
+    const {
+      isSignedIn,
+      imageUrl,
+      route,
+      boxes,
+      isProfileOpen,
+      isUploadFormOpen,
+      user } = this.state;
     return (
       <div className="App">
         <Particles className='particles'
           params={particlesOptions}
         />
-        <Navigation user={user} isSignedIn={isSignedIn} getProfileImage={this.getProfileImage} onRouteChange={this.onRouteChange}
-          toggleModal={this.toggleModal} toggleUploadModal={this.toggleUploadModal} />
+        <Navigation
+          user={user}
+          isSignedIn={isSignedIn}
+          getProfileImage={this.getProfileImage}
+          onRouteChange={this.onRouteChange}
+          toggleModal={this.toggleModal}
+          toggleUploadModal={this.toggleUploadModal}
+        />
         {isProfileOpen &&
           <Modal>
             <Profile
               isProfileOpen={isProfileOpen}
               toggleModal={this.toggleModal}
               loadUser={this.loadUser}
-              user={user}
-              isProfileImage={isProfileImage} />
+              user={user} />
           </Modal>}
 
         {isUploadFormOpen &&
           <Modal>
             <UploadForm
+              getProfileImage={this.getProfileImage}
               user={user}
               toggleUploadModal={this.toggleUploadModal}
             />
