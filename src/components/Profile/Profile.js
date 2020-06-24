@@ -50,7 +50,7 @@ class Profile extends React.Component {
       this.setState({
         defaultProfile: document.getElementById('avatar1').src
       })
-    }, 50)
+    }, 0)
   }
 
   render() {
